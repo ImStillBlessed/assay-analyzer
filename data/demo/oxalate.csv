@@ -1,0 +1,4 @@
+sample_id,replicate,sample_mass_g,titre_ml,blank_titre_ml
+Cottonseed extract,1,0.98,0.53,0.0
+Cottonseed extract,2,1.008,0.54,0.0
+Cottonseed extract,3,0.995,0.59,0.0

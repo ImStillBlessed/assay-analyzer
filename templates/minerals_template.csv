@@ -1,0 +1,7 @@
+kind,element,sample_id,replicate,absorbance,std_conc_mg_l,dilution_factor,digest_volume_ml,sample_mass_g
+blank,Ca,Reagent blank,1,0.0028,,,,
+blank,Ca,Reagent blank,2,0.0012,,,,
+standard,Ca,Standard,1,0.0505,1.0,,,
+standard,Ca,Standard,1,0.0935,2.0,,,
+sample,Ca,Cottonseed extract,1,0.0736,,10.0,100.0,0.9967
+sample,Ca,Cottonseed extract,2,0.0734,,10.0,100.0,1.0025

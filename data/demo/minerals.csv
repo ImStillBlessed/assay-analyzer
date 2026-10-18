@@ -1,0 +1,145 @@
+kind,element,sample_id,replicate,absorbance,std_conc_mg_l,dilution_factor,digest_volume_ml,sample_mass_g
+blank,Ca,Reagent blank,1,0.0028,,,,
+blank,Ca,Reagent blank,2,0.0012,,,,
+blank,Ca,Reagent blank,3,0.0029,,,,
+blank,Ca,Reagent blank,4,0.0032,,,,
+blank,Ca,Reagent blank,5,0.002,,,,
+blank,Ca,Reagent blank,6,0.0022,,,,
+blank,Ca,Reagent blank,7,0.0009,,,,
+standard,Ca,Standard,1,0.0505,1.0,,,
+standard,Ca,Standard,1,0.0935,2.0,,,
+standard,Ca,Standard,1,0.1823,4.0,,,
+standard,Ca,Standard,1,0.3621,8.0,,,
+standard,Ca,Standard,1,0.5427,12.0,,,
+sample,Ca,Cottonseed extract,1,0.0736,,10.0,100.0,0.9967
+sample,Ca,Cottonseed extract,2,0.0734,,10.0,100.0,1.0025
+sample,Ca,Cottonseed extract,3,0.0769,,10.0,100.0,0.9994
+sample,Ca,Cottonseed oil extract,1,0.0075,,1.0,100.0,1.004
+sample,Ca,Cottonseed oil extract,2,0.0088,,1.0,100.0,0.9948
+sample,Ca,Cottonseed oil extract,3,0.0076,,1.0,100.0,1.0003
+blank,K,Reagent blank,1,0.0006,,,,
+blank,K,Reagent blank,2,0.0015,,,,
+blank,K,Reagent blank,3,0.0012,,,,
+blank,K,Reagent blank,4,0.0018,,,,
+blank,K,Reagent blank,5,0.0025,,,,
+blank,K,Reagent blank,6,0.0013,,,,
+blank,K,Reagent blank,7,0.0019,,,,
+standard,K,Standard,1,0.0203,2.0,,,
+standard,K,Standard,1,0.0459,5.0,,,
+standard,K,Standard,1,0.0906,10.0,,,
+standard,K,Standard,1,0.4521,50.0,,,
+standard,K,Standard,1,0.9033,100.0,,,
+sample,K,Cottonseed extract,1,0.0764,,10.0,100.0,0.997
+sample,K,Cottonseed extract,2,0.0771,,10.0,100.0,1.0014
+sample,K,Cottonseed extract,3,0.0758,,10.0,100.0,0.9988
+sample,K,Cottonseed oil extract,1,0.0024,,1.0,100.0,0.9972
+sample,K,Cottonseed oil extract,2,0.0019,,1.0,100.0,1.0023
+sample,K,Cottonseed oil extract,3,0.0033,,1.0,100.0,0.9938
+blank,Fe,Reagent blank,1,0.0015,,,,
+blank,Fe,Reagent blank,2,0.0015,,,,
+blank,Fe,Reagent blank,3,-0.0003,,,,
+blank,Fe,Reagent blank,4,0.0017,,,,
+blank,Fe,Reagent blank,5,0.0022,,,,
+blank,Fe,Reagent blank,6,0.0024,,,,
+blank,Fe,Reagent blank,7,0.0023,,,,
+standard,Fe,Standard,1,0.01,0.1,,,
+standard,Fe,Standard,1,0.0229,0.25,,,
+standard,Fe,Standard,1,0.0457,0.5,,,
+standard,Fe,Standard,1,0.0868,1.0,,,
+standard,Fe,Standard,1,0.1685,2.0,,,
+sample,Fe,Cottonseed extract,1,0.0527,,1.0,100.0,1.0051
+sample,Fe,Cottonseed extract,2,0.0553,,1.0,100.0,1.0085
+sample,Fe,Cottonseed extract,3,0.052,,1.0,100.0,1.0093
+sample,Fe,Cottonseed oil extract,1,0.0057,,1.0,100.0,1.0012
+sample,Fe,Cottonseed oil extract,2,0.0043,,1.0,100.0,0.9971
+sample,Fe,Cottonseed oil extract,3,0.0036,,1.0,100.0,1.0052
+blank,Zn,Reagent blank,1,0.0024,,,,
+blank,Zn,Reagent blank,2,0.0009,,,,
+blank,Zn,Reagent blank,3,0.0014,,,,
+blank,Zn,Reagent blank,4,0.0013,,,,
+blank,Zn,Reagent blank,5,0.0017,,,,
+blank,Zn,Reagent blank,6,0.0019,,,,
+blank,Zn,Reagent blank,7,0.0035,,,,
+standard,Zn,Standard,1,0.0244,0.05,,,
+standard,Zn,Standard,1,0.044,0.1,,,
+standard,Zn,Standard,1,0.1067,0.25,,,
+standard,Zn,Standard,1,0.2133,0.5,,,
+standard,Zn,Standard,1,0.4226,1.0,,,
+sample,Zn,Cottonseed extract,1,0.155,,1.0,100.0,1.0045
+sample,Zn,Cottonseed extract,2,0.1473,,1.0,100.0,0.9887
+sample,Zn,Cottonseed extract,3,0.1464,,1.0,100.0,1.0014
+sample,Zn,Cottonseed oil extract,1,0.0069,,1.0,100.0,1.0028
+sample,Zn,Cottonseed oil extract,2,0.0067,,1.0,100.0,0.9892
+sample,Zn,Cottonseed oil extract,3,0.0057,,1.0,100.0,1.003
+blank,Mn,Reagent blank,1,0.0016,,,,
+blank,Mn,Reagent blank,2,0.0022,,,,
+blank,Mn,Reagent blank,3,0.0012,,,,
+blank,Mn,Reagent blank,4,0.0008,,,,
+blank,Mn,Reagent blank,5,0.0011,,,,
+blank,Mn,Reagent blank,6,0.0021,,,,
+blank,Mn,Reagent blank,7,0.0025,,,,
+standard,Mn,Standard,1,0.0087,0.02,,,
+standard,Mn,Standard,1,0.0131,0.05,,,
+standard,Mn,Standard,1,0.0237,0.1,,,
+standard,Mn,Standard,1,0.0465,0.2,,,
+standard,Mn,Standard,1,0.0848,0.4,,,
+sample,Mn,Cottonseed extract,1,0.0307,,1.0,100.0,0.9952
+sample,Mn,Cottonseed extract,2,0.0324,,1.0,100.0,1.0101
+sample,Mn,Cottonseed extract,3,0.0323,,1.0,100.0,0.9976
+sample,Mn,Cottonseed oil extract,1,0.0021,,1.0,100.0,1.0027
+sample,Mn,Cottonseed oil extract,2,0.0021,,1.0,100.0,1.0073
+sample,Mn,Cottonseed oil extract,3,0.0027,,1.0,100.0,1.0025
+blank,Cu,Reagent blank,1,0.0011,,,,
+blank,Cu,Reagent blank,2,0.0026,,,,
+blank,Cu,Reagent blank,3,0.0044,,,,
+blank,Cu,Reagent blank,4,0.0032,,,,
+blank,Cu,Reagent blank,5,0.0026,,,,
+blank,Cu,Reagent blank,6,0.0013,,,,
+blank,Cu,Reagent blank,7,0.0023,,,,
+standard,Cu,Standard,1,0.0076,0.02,,,
+standard,Cu,Standard,1,0.0114,0.05,,,
+standard,Cu,Standard,1,0.0212,0.1,,,
+standard,Cu,Standard,1,0.0375,0.2,,,
+standard,Cu,Standard,1,0.0767,0.4,,,
+sample,Cu,Cottonseed extract,1,0.0143,,1.0,100.0,0.9908
+sample,Cu,Cottonseed extract,2,0.0122,,1.0,100.0,1.0036
+sample,Cu,Cottonseed extract,3,0.0124,,1.0,100.0,1.0009
+sample,Cu,Cottonseed oil extract,1,0.0021,,1.0,100.0,1.0003
+sample,Cu,Cottonseed oil extract,2,0.0014,,1.0,100.0,0.9991
+sample,Cu,Cottonseed oil extract,3,0.002,,1.0,100.0,0.9951
+blank,Pb,Reagent blank,1,0.003,,,,
+blank,Pb,Reagent blank,2,0.0007,,,,
+blank,Pb,Reagent blank,3,0.0015,,,,
+blank,Pb,Reagent blank,4,0.0019,,,,
+blank,Pb,Reagent blank,5,0.0019,,,,
+blank,Pb,Reagent blank,6,0.0015,,,,
+blank,Pb,Reagent blank,7,0.0035,,,,
+standard,Pb,Standard,1,0.0043,0.05,,,
+standard,Pb,Standard,1,0.004,0.1,,,
+standard,Pb,Standard,1,0.0062,0.2,,,
+standard,Pb,Standard,1,0.0192,0.5,,,
+standard,Pb,Standard,1,0.0392,1.0,,,
+sample,Pb,Cottonseed extract,1,0.0001,,1.0,100.0,1.001
+sample,Pb,Cottonseed extract,2,0.0021,,1.0,100.0,0.9931
+sample,Pb,Cottonseed extract,3,0.0021,,1.0,100.0,1.0053
+sample,Pb,Cottonseed oil extract,1,0.0029,,1.0,100.0,1.0007
+sample,Pb,Cottonseed oil extract,2,0.0015,,1.0,100.0,1.0063
+sample,Pb,Cottonseed oil extract,3,0.0012,,1.0,100.0,1.0022
+blank,Cd,Reagent blank,1,0.0011,,,,
+blank,Cd,Reagent blank,2,0.0025,,,,
+blank,Cd,Reagent blank,3,0.0009,,,,
+blank,Cd,Reagent blank,4,0.0021,,,,
+blank,Cd,Reagent blank,5,0.0023,,,,
+blank,Cd,Reagent blank,6,0.0027,,,,
+blank,Cd,Reagent blank,7,0.0011,,,,
+standard,Cd,Standard,1,0.0071,0.01,,,
+standard,Cd,Standard,1,0.0108,0.02,,,
+standard,Cd,Standard,1,0.0267,0.05,,,
+standard,Cd,Standard,1,0.0459,0.1,,,
+standard,Cd,Standard,1,0.0903,0.2,,,
+sample,Cd,Cottonseed extract,1,0.0013,,1.0,100.0,1.0025
+sample,Cd,Cottonseed extract,2,0.0027,,1.0,100.0,0.9935
+sample,Cd,Cottonseed extract,3,-0.0005,,1.0,100.0,1.0022
+sample,Cd,Cottonseed oil extract,1,0.0011,,1.0,100.0,0.9954
+sample,Cd,Cottonseed oil extract,2,0.0032,,1.0,100.0,1.0032
+sample,Cd,Cottonseed oil extract,3,0.0026,,1.0,100.0,1.0103

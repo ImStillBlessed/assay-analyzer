@@ -1,0 +1,5 @@
+sample_id,replicate,concentration,abs_sample,abs_control,abs_blank
+Cottonseed extract,1,25.0,0.861,0.905,0.004
+Cottonseed extract,1,50.0,0.748,0.905,0.009
+Cottonseed extract,1,100.0,0.609,0.905,0.01
+Cottonseed extract,1,200.0,0.446,0.905,0.018

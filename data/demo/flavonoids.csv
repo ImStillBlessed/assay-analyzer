@@ -1,0 +1,16 @@
+kind,sample_id,replicate,absorbance,std_conc,dilution_factor,sample_mass_g,extract_volume_ml
+blank,Reagent blank,1,0.042,,,,
+blank,Reagent blank,2,0.042,,,,
+standard,Standard,1,0.1,25.0,,,
+standard,Standard,2,0.109,25.0,,,
+standard,Standard,1,0.167,50.0,,,
+standard,Standard,2,0.167,50.0,,,
+standard,Standard,1,0.303,100.0,,,
+standard,Standard,2,0.305,100.0,,,
+standard,Standard,1,0.561,200.0,,,
+standard,Standard,2,0.556,200.0,,,
+standard,Standard,1,0.815,300.0,,,
+standard,Standard,2,0.829,300.0,,,
+sample,Cottonseed extract,1,0.583,,4.0,1.0059,10.0
+sample,Cottonseed extract,2,0.608,,4.0,0.9918,10.0
+sample,Cottonseed extract,3,0.579,,4.0,1.0162,10.0

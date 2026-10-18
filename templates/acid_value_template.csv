@@ -1,0 +1,5 @@
+sample_id,replicate,sample_mass_g,titre_ml,blank_titre_ml,normality
+Fresh-pressed oil,1,5.042,5.68,0.0,0.1
+Fresh-pressed oil,2,4.95,4.9,0.0,0.1
+Fresh-pressed oil,3,5.076,5.2,0.0,0.1
+Market oil,1,5.005,16.16,0.0,0.1

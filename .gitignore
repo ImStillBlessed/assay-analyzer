@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+report/
+*.egg-info/
+
+# Real thesis data stays on this machine only.
+data/private/
