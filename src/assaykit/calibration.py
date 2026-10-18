@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from assaykit.common import AssayInputError, AssayResult, prepare
+from assaykit.common import AssayInputError, AssayResult, prepare, require_positive
 from assaykit.stats import summarize
 
 STD_UNITS = {"µg/mL": 1.0, "mg/mL": 1000.0, "mg/L": 1.0}
@@ -81,7 +81,7 @@ class Curve:
 def fit_curve(std: pd.DataFrame, x: str, y: str, what: str) -> Curve:
     if std.empty:
         raise AssayInputError(f"{what}: no standard rows (kind = standard).")
-    if std[x].isna().any():
+    if x not in std or y not in std or std[x].isna().any() or std[y].isna().any():
         raise AssayInputError(f"{what}: every standard row needs a concentration in '{x}'.")
     if std[x].nunique() < 3:
         raise AssayInputError(f"{what}: the standard curve needs at least 3 different concentrations.")
@@ -148,6 +148,7 @@ def analyze_curve_assay(
     if samples.empty:
         raise AssayInputError(f"{what}: no sample rows (kind = sample).")
     samples["dilution_factor"] = samples.get("dilution_factor", pd.Series(1.0, index=samples.index)).fillna(1.0)
+    require_positive(samples, ["dilution_factor", "sample_mass_g", "extract_volume_ml", "extract_mg_per_ml"], what)
     samples["conc_ug_ml"] = curve.concentration(samples["abs_corrected"]) * samples["dilution_factor"]
 
     value_col, unit, basis_warn = _per_gram(samples, spec)
@@ -156,13 +157,14 @@ def analyze_curve_assay(
         warns.append(f"{what}: some samples read below the curve intercept and come out negative. "
                      "Check the blank and whether the sample is too dilute.")
 
-    summary, _, stat_warns = summarize(samples, value_col, cv_limit=cv_limit, alpha=alpha,
+    summary, comparison, stat_warns = summarize(samples, value_col, cv_limit=cv_limit, alpha=alpha,
                                        higher_is_better=spec.higher_is_better)
     return AssayResult(
         assay=what, unit=unit, rows=pd.concat([std, samples], ignore_index=True), summary=summary,
         warnings=warns + [f"{what} — {w}" for w in stat_warns],
         extra={"curve": curve, "standards": std, "samples": samples, "value_col": value_col,
-               "blank_mean": blank_mean, "spec": spec},
+               "blank_mean": blank_mean, "spec": spec, "comparisons": {"samples": comparison},
+               "alpha": alpha, "std_unit": std_unit},
     )
 
 
@@ -197,72 +199,115 @@ def analyze_minerals(df: pd.DataFrame, min_r2: float = 0.995, cv_limit: float = 
 
     Rows need `element`. Samples can carry either an `absorbance` (read off that
     element's curve) or a `reading_mg_l` if the instrument already reports
-    concentration. Detection limit per element = 3 × SD(blank) / slope when there are
-    ≥ 2 blanks. A sample whose mean reading is below it is reported as ND (not detected).
+    concentration. Alternatively supply final result_mg_kg, or detection_status=nd
+    without inventing a numeric value. Optional lod_mg_l or lod_mg_kg records the
+    instrument limit. Otherwise LOD = 3 × SD(blank) / slope when there are ≥ 2 blanks.
+    Unknown detection limits remain unknown. Numeric groups are compared to the
+    mean normalized detection limit; groups mixing explicit ND and numeric rows
+    are reported as censored, without calculating a mean or inferential statistics.
     """
     what = "Minerals (AAS)"
     rows = prepare(df, what, required=["kind", "element", "sample_id"], numeric=[],
-                   optional_numeric=["absorbance", "reading_mg_l", "std_conc_mg_l", "dilution_factor",
+                   optional_numeric=["absorbance", "reading_mg_l", "result_mg_kg", "lod_mg_l", "lod_mg_kg", "std_conc_mg_l", "dilution_factor",
                                      "digest_volume_ml", "sample_mass_g"])
     rows = _check_kind(rows, what)
     rows["element"] = rows["element"].astype(str).str.strip()
-    for col in ("absorbance", "reading_mg_l"):
+    for col in ("absorbance", "reading_mg_l", "result_mg_kg", "lod_mg_l", "lod_mg_kg", "std_conc_mg_l"):
         if col not in rows.columns:
             rows[col] = np.nan
     samples = rows[rows["kind"] == "sample"].copy()
+    if samples.empty:
+        raise AssayInputError(f"{what}: no sample rows (kind = sample).")
+    samples["detection_status"] = samples.get("detection_status", pd.Series("auto", index=samples.index)).fillna("auto").astype(str).str.lower().str.strip()
+    if not samples["detection_status"].isin(["auto", "detected", "nd"]).all():
+        raise AssayInputError(f"{what}: detection_status must be auto, detected or nd.")
+    final = samples["result_mg_kg"].notna()
+    nd = samples["detection_status"].eq("nd")
+    convert = ~final & ~nd
     for col in ("digest_volume_ml", "sample_mass_g"):
-        if col not in samples.columns or samples[col].isna().any():
-            raise AssayInputError(f"{what}: every sample row needs {col}.")
+        if col not in samples:
+            samples[col] = np.nan
+        if samples.loc[convert, col].isna().any():
+            raise AssayInputError(f"{what}: readings in mg/L or absorbance need {col}.")
     samples["dilution_factor"] = samples.get("dilution_factor", pd.Series(1.0, index=samples.index)).fillna(1.0)
+    require_positive(samples, ["sample_mass_g", "digest_volume_ml", "dilution_factor"], what)
+    for col in ("lod_mg_l", "lod_mg_kg"):
+        if (samples[col].dropna() < 0).any():
+            raise AssayInputError(f"{what}: {col} cannot be negative.")
 
     warns: list[str] = []
     curves: dict[str, Curve] = {}
     lods: dict[str, float] = {}
     for element, el_rows in rows.groupby("element", sort=False):
         el_samples = samples["element"] == element
-        need_curve = samples.loc[el_samples, "reading_mg_l"].isna().any()
+        from_curve = el_samples & convert & samples["reading_mg_l"].isna()
+        need_curve = from_curve.any()
         blanks = el_rows.loc[el_rows["kind"] == "blank", "absorbance"].dropna()
         blank_mean = float(blanks.mean()) if len(blanks) else 0.0
         if need_curve:
+            if samples.loc[from_curve, "absorbance"].isna().any():
+                raise AssayInputError(f"{what} {element}: provide absorbance, reading_mg_l, result_mg_kg or detection_status=nd.")
             std = el_rows[el_rows["kind"] == "standard"].copy()
             std["abs_corrected"] = std["absorbance"] - blank_mean
             curve = fit_curve(std, "std_conc_mg_l", "abs_corrected", f"{what} {element}")
             curves[element] = curve
             if curve.r2 < min_r2:
                 warns.append(f"{what} {element}: calibration R² is {curve.r2:.4f} (below {min_r2}).")
-            from_curve = el_samples & samples["reading_mg_l"].isna()
             samples.loc[from_curve, "reading_mg_l"] = curve.concentration(samples.loc[from_curve, "absorbance"] - blank_mean)
             if len(blanks) >= 2:
                 lods[element] = float(3 * blanks.std() / curve.slope)
 
-    for element in samples["element"].unique():
-        if element in curves and element not in lods:
-            warns.append(f"{what} {element}: fewer than 2 blank readings, so no detection limit; only readings "
-                         "at or below zero are reported as ND. Read at least 3 (ideally 7+) reagent blanks.")
-
     samples["digest_mg_l"] = samples["reading_mg_l"] * samples["dilution_factor"]
-    samples["mg_per_kg"] = samples["digest_mg_l"] * samples["digest_volume_ml"] / samples["sample_mass_g"]
+    factor = samples["dilution_factor"] * samples["digest_volume_ml"] / samples["sample_mass_g"]
+    samples["mg_per_kg"] = samples["result_mg_kg"].combine_first(samples["reading_mg_l"] * factor)
+    if samples.loc[~nd, "mg_per_kg"].isna().any():
+        raise AssayInputError(f"{what}: each measured sample needs a numeric result.")
+    instrument_lod = samples["lod_mg_l"].combine_first(samples["element"].map(lods))
+    if (samples["lod_mg_l"].notna() & factor.isna() & samples["lod_mg_kg"].isna()).any():
+        raise AssayInputError(f"{what}: LOD in mg/L needs mass and digest volume; use lod_mg_kg for final results.")
+    samples["effective_lod_mg_kg"] = samples["lod_mg_kg"].combine_first(instrument_lod * factor)
+    samples["lod_source"] = np.select(
+        [samples["lod_mg_kg"].notna() | samples["lod_mg_l"].notna(), samples["element"].isin(lods)],
+        ["supplied", "blank-derived"], default="unknown")
     # Detection is decided per sample from the mean of its replicate readings, so one noisy
     # replicate cannot turn an absent element into a reported value (or the reverse).
-    mean_reading = samples.groupby(["element", "sample_id"])["reading_mg_l"].transform("mean")
-    lod = samples["element"].map(lods).fillna(0.0)
-    samples["detected"] = mean_reading > lod
+    keys = ["element", "sample_id"]
+    mean_reading = samples.groupby(keys)["mg_per_kg"].transform("mean")
+    lod = samples.groupby(keys)["effective_lod_mg_kg"].transform("mean")
+    censored = nd.groupby([samples[k] for k in keys]).transform("any")
+    mixed = censored & ~nd.groupby([samples[k] for k in keys]).transform("all")
+    samples["detected"] = ~censored & (lod.isna() | (mean_reading > lod))
+    for element in samples.loc[samples["effective_lod_mg_kg"].isna() & ~nd, "element"].unique():
+        warns.append(f"{what} {element}: detection limit unknown; numeric readings are not evidence of a validated detection limit.")
 
-    tables = []
+    tables, comparisons = [], {}
     for element, sub in samples.groupby("element", sort=False):
         detected = sub[sub["detected"]]
         if detected.empty:
             t = pd.DataFrame({"sample_id": sub["sample_id"].unique()})
         else:
-            t, _, sw = summarize(detected, "mg_per_kg", cv_limit=cv_limit, alpha=alpha, warn_single=False)
+            t, comparison, sw = summarize(detected, "mg_per_kg", cv_limit=cv_limit, alpha=alpha, warn_single=False)
+            comparisons[element] = comparison
             warns += [f"{what} {element} — {w}" for w in sw]
             t = pd.DataFrame({"sample_id": sub["sample_id"].unique()}).merge(t, on="sample_id", how="left")
         t.insert(0, "element", element)
+        counts = sub.groupby("sample_id").size()
+        t["n"] = t["sample_id"].map(counts)
+        for col in ("mean", "sd", "sem", "cv_pct"):
+            if col not in t:
+                t[col] = np.nan
+        if "letters" not in t:
+            t["letters"] = ""
         t["result"] = [f"{m:.4g}" if pd.notna(m) else "ND" for m in t.get("mean", pd.Series([np.nan] * len(t)))]
+        mixed_ids = samples.loc[mixed & samples["element"].eq(element), "sample_id"].unique()
+        t.loc[t["sample_id"].isin(mixed_ids), "result"] = "Censored"
+        for sid in mixed_ids:
+            warns.append(f"{what} {element} {sid}: numeric and ND replicates are mixed; summary statistics omitted.")
         tables.append(t)
     summary = pd.concat(tables, ignore_index=True)
 
     return AssayResult(
         assay=what, unit="mg/kg", rows=samples, summary=summary, warnings=warns,
-        extra={"curves": curves, "lods_mg_l": lods, "value_col": "mg_per_kg"},
+        extra={"curves": curves, "lods_mg_l": lods, "value_col": "mg_per_kg", "alpha": alpha,
+               "comparisons": comparisons},
     )

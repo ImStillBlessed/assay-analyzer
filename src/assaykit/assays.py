@@ -1,4 +1,4 @@
-"""Catalogue of supported assays, in the order of the thesis methods chapter.
+"""Shared, extensible catalogue of laboratory assays.
 
 The CLI and the app both read from here: an input file named `<key>.csv` (or .xlsx)
 is analysed by the matching entry.
@@ -13,9 +13,10 @@ from typing import Callable
 
 import pandas as pd
 
-from assaykit.calibration import analyze_curve_assay, analyze_minerals
+from assaykit.calibration import CurveAssay, analyze_curve_assay, analyze_minerals
 from assaykit.common import AssayResult
 from assaykit.dpph import analyze_dpph
+from assaykit.screening import analyze_screening
 from assaykit.gravimetric import analyze_gravimetric
 from assaykit.titration import analyze_acid_value, analyze_oxalate, analyze_peroxide, analyze_phytate
 
@@ -33,7 +34,13 @@ class AssayInfo:
         """Call the analysis, passing only the options it accepts."""
         target = self.analyze.func if isinstance(self.analyze, partial) else self.analyze
         accepted = inspect.signature(target).parameters
-        return self.analyze(df, **{k: v for k, v in options.items() if k in accepted and v is not None})
+        selected = {k: v for k, v in options.items() if k in accepted and v is not None}
+        result = self.analyze(df, **selected)
+        result.extra["assay_key"] = self.key
+        defaults = {name: param.default for name, param in inspect.signature(self.analyze).parameters.items()
+                    if param.default is not inspect.Parameter.empty}
+        result.extra["options"] = {**defaults, **selected}
+        return result
 
 
 CURVE_COLUMNS = ("kind (standard / sample / blank), sample_id, replicate, absorbance, std_conc; for per-gram "
@@ -43,6 +50,10 @@ TITRE_COLUMNS = "sample_id, replicate, sample_mass_g, titre_ml, blank_titre_ml (
 ASSAYS: dict[str, AssayInfo] = {
     a.key: a
     for a in [
+        AssayInfo("screening", "Qualitative screening", "Qualitative screening",
+                  "Recorded presence, absence or indeterminate observations; no inferential statistics",
+                  "sample_id, test, status (present / absent / indeterminate); optional observation, replicate",
+                  analyze_screening),
         AssayInfo("tpc", "Total phenolics", "Phytochemicals",
                   "Folin–Ciocalteu, 765 nm, tannic acid standard → mg TAE/g", CURVE_COLUMNS,
                   partial(analyze_curve_assay, assay="tpc")),
@@ -80,7 +91,23 @@ ASSAYS: dict[str, AssayInfo] = {
         AssayInfo("minerals", "Minerals (AAS)", "Minerals",
                   "Wet digestion (HNO3:HClO4 4:1), AAS, per-element curves → mg/kg; ND below detection limit",
                   "kind, element, sample_id, replicate, absorbance (or reading_mg_l), std_conc_mg_l, "
-                  "digest_volume_ml, sample_mass_g, dilution_factor (optional)",
+                  "digest_volume_ml, sample_mass_g; or result_mg_kg / detection_status=nd; optional dilution_factor, lod_mg_l, lod_mg_kg",
                   analyze_minerals),
     ]
 }
+
+
+def register_assay(info: AssayInfo) -> None:
+    """Extend the shared UI/CLI catalogue without changing either front end."""
+    if not info.key or not all(c.islower() or c.isdigit() or c == "_" for c in info.key):
+        raise ValueError("Assay keys must use lowercase letters, digits and underscores.")
+    if info.key in ASSAYS:
+        raise ValueError(f"Assay '{info.key}' is already registered.")
+    ASSAYS[info.key] = info
+
+
+def register_curve_assay(spec: CurveAssay, group: str = "Standard-curve assays") -> None:
+    """Register any assay following concentration × extract volume / sample mass."""
+    register_assay(AssayInfo(spec.key, spec.name, group,
+                            f"{spec.standard}, {spec.wavelength_nm} nm → {spec.unit}", CURVE_COLUMNS,
+                            partial(analyze_curve_assay, assay=spec)))

@@ -46,6 +46,6 @@ def analyze_gravimetric(
         warns.append(f"{what}: a residue is heavier than the sample it came from. Check the masses.")
 
     rows["content"] = rows["residue_g"] / rows["sample_mass_g"] * UNITS[unit]
-    summary, _, stat_warns = summarize(rows, "content", cv_limit=cv_limit, alpha=alpha)
+    summary, comparison, stat_warns = summarize(rows, "content", cv_limit=cv_limit, alpha=alpha)
     return AssayResult(assay=what, unit=unit, rows=rows, summary=summary,
-                       warnings=warns + [f"{what} — {w}" for w in stat_warns], extra={"value_col": "content"})
+                       warnings=warns + [f"{what} — {w}" for w in stat_warns], extra={"value_col": "content", "alpha": alpha, "comparisons": {"samples": comparison}})

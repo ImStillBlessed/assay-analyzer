@@ -1,20 +1,20 @@
 # Assay Analyzer
 
-**Every calculation from my MSc thesis, from raw bench readings to a thesis-ready results table, done the same way every time.**
+A general laboratory assay analyzer: import bench measurements, calculate results, check replicates, compare samples, and export plots and an auditable Excel report.
 
-For my MSc in Medical Biochemistry (University of Benin, 2026) I characterised *Gossypium hirsutum* cottonseed and its pressed oil: phytochemicals, anti-nutrients, antioxidant activity, oil quality and minerals. That came to twelve assays, each run in triplicate.
+The GUI is a guided dashboard: a dedicated **Settings** page, plain-language value guides, collapsible measurement instructions, direct data entry or file upload, and configurable reference/range flags. See [the dashboard guide](docs/guided-dashboard.md).
 
-The bench work was the easy part. Afterwards came copying readings from a notebook into Excel, rebuilding a standard curve for every colorimetric assay, re-typing the same titration formula down a column, and running ANOVA in SPSS to get the superscript letters for each results table. Every step was a chance to make a mistake nobody would catch.
+The default example now uses the supplied results-only tables: **76 calculated observations**, including confirmed triplicates, DPPH/FRAP concentration series and single mineral determinations. Open **Calculated results** to inspect them or upload your own result tables. Raw bench-reading examples remain available separately. See [the source and input-format notes](data/examples/README.md).
 
-This is the tool I wished I'd had. Give it the numbers you wrote down and it does the calculations, checks the replicates, compares samples statistically, and hands back figures and an Excel report formatted like a thesis table. It also tells you, in plain language, when something in your data looks wrong.
+Use it across studies with your own sample names and materials. Twelve quantitative assays and a qualitative screening log share a registry used by the Python API, command line, and Streamlit app. New assays can reuse the standard-curve engine or register a separate calculation.
+
+The project grew out of a cottonseed research project. That study provides context and a synthetic demonstration, not a restriction on the samples or studies the software accepts. Published thesis summaries are not treated as raw experimental observations.
 
 ![DPPH dose-response curves](docs/dpph_curves.png)
 
----
-
 ## What it covers
 
-Twelve assays in five groups, following the methods chapter of my thesis:
+Twelve quantitative assays in five groups, plus a qualitative screening log. Defaults reflect the original laboratory protocols; confirm the standard, units and preparation factors for your own protocol:
 
 | Group | Assay | Method | Result |
 | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ Underneath, these are only **four kinds of calculation**, and the code is organi
 3. **Titration** (acid value, FFA, peroxide value, phytate, oxalate): titre, normality and mass go into a fixed formula.
 4. **Gravimetric** (alkaloids, saponins): residue mass ÷ sample mass.
 
-Adding a new colorimetric assay takes one line: name the standard, the wavelength and the unit.
+See [Extending and configuring assays](docs/extending-assays.md) for registration, calibration conventions, mineral ND inputs and report provenance.
 
 ---
 
@@ -95,7 +95,7 @@ uv sync --extra app                       # or: pip install -e ".[app]"
 uv run streamlit run app/streamlit_app.py
 ```
 
-It opens in the browser with demo data loaded. Turn off **Use demo data** to upload your own CSV or Excel files, one per assay. **Overview & report** gathers everything into one table and one Excel workbook.
+It opens in the browser with clearly labeled synthetic demo data loaded. Open **Settings** to name your study, configure assay methods and choose comparison targets. Turn off **Use example data** to upload your own CSV/Excel files or enter readings directly. **Overview & report** gathers everything into one table and one Excel workbook. Readings remain available when switching sections; use **Clear these readings** to clear an assay. Data and settings stay in the current Streamlit session and are not saved across server restarts.
 
 ### Command line
 
@@ -143,11 +143,13 @@ There are two kinds of tests:
 
 ```text
 src/assaykit/
-  assays.py       catalogue of all twelve assays (used by the app and CLI)
+  assays.py       shared assay catalogue and registration helpers
   calibration.py  standard-curve assays and AAS minerals, with LOD
   dpph.py         % inhibition and IC50 (three methods)
   titration.py    acid value, %FFA, peroxide value, phytate, oxalate
   gravimetric.py  alkaloids, saponins
+  screening.py    qualitative observations (present/absent/indeterminate)
+  io.py           validated CSV/XLSX imports
   stats.py        mean/SD/SEM, ANOVA, Tukey HSD, compact letters
   plots.py        figures
   report.py       thesis-style overview and Excel report
@@ -162,7 +164,10 @@ tests/
 
 - Long-format input only. Microplate-reader (96-well) layouts are not parsed yet.
 - ANOVA assumes roughly normal replicates with similar variances, which is standard practice but worth stating at n = 3.
-- Next: a qualitative phytochemical screening log (Dragendorff, ferric chloride, froth tests), correlation of TPC with antioxidant activity across samples, and storage time-course plots for oil oxidation.
+- Optional future work: correlation across assay results, time-course analysis, and batch-aware study designs.
+- Replicate IDs should identify independent observations appropriate to the statistical comparison. Repeated technical readings do not establish biological replication.
+- FRAP is reported in calibrated mg AAE/g; there is no assumed conversion to percentage inhibition.
+- Phytate and oxalate coefficients depend on the extraction/aliquot conventions of the selected method. Confirm those assumptions for a new protocol; changing a sample name does not validate a method.
 
 ## References
 

@@ -17,6 +17,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 from scipy import stats
+from assaykit.common import AssayInputError
 
 
 @dataclass
@@ -39,6 +40,10 @@ def summarize(
 ) -> tuple[pd.DataFrame, Comparison | None, list[str]]:
     """Mean, SD, SEM, CV per sample plus Tukey letters ('a' = best). Returns (table, comparison, warnings)."""
     warns: list[str] = []
+    if not 0 < alpha < 1:
+        raise AssayInputError("Significance level alpha must be between 0 and 1.")
+    if not np.isfinite(cv_limit) or cv_limit <= 0:
+        raise AssayInputError("Replicate CV limit must be positive and finite.")
     g = df.groupby(group_col, sort=False)[value_col]
     table = g.agg(n="count", mean="mean", sd="std").reset_index()
     table["sem"] = table["sd"] / np.sqrt(table["n"])

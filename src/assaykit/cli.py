@@ -14,17 +14,14 @@ import pandas as pd
 
 from assaykit.assays import ASSAYS
 from assaykit.common import AssayInputError
+from assaykit.io import read_table
 from assaykit.report import overview, write_report
-
-
-def read_table(path: Path) -> pd.DataFrame:
-    return pd.read_excel(path) if path.suffix.lower() in (".xlsx", ".xls") else pd.read_csv(path)
 
 
 def find_inputs(folder: Path) -> dict[str, Path]:
     found = {}
     for key in ASSAYS:
-        for ext in (".csv", ".xlsx", ".xls"):
+        for ext in (".csv", ".xlsx"):
             if (folder / f"{key}{ext}").exists():
                 found[key] = folder / f"{key}{ext}"
                 break
@@ -32,6 +29,10 @@ def find_inputs(folder: Path) -> dict[str, Path]:
 
 
 def main(argv: list[str] | None = None) -> int:
+    # Windows redirected output may otherwise use cp1252, which cannot print units.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(prog="assaykit", description="Analyse phytochemical, antioxidant, anti-nutrient, "
                                 "oil-quality and mineral assay data.")
     p.add_argument("folder", type=Path, nargs="?", help="folder with <assay>.csv / .xlsx files")
@@ -41,6 +42,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cv-limit", type=float, default=10.0, help="flag replicate CV above this %% (default: 10)")
     p.add_argument("--ic50-method", choices=["logistic", "interpolation", "linear"], default="logistic")
     p.add_argument("--conc-unit", default="µg/mL", help="DPPH concentration unit (default µg/mL)")
+    p.add_argument("--std-unit", choices=["µg/mL", "mg/mL", "mg/L"], default="µg/mL",
+                   help="input units for colorimetric standard curves (minerals always use mg/L)")
+    p.add_argument("--study", default="", help="optional study label recorded in the report")
     p.add_argument("--list", action="store_true", help="list supported assays and their input columns")
     args = p.parse_args(argv)
 
@@ -55,11 +59,15 @@ def main(argv: list[str] | None = None) -> int:
               file=sys.stderr)
         return 1
 
-    options = {"alpha": args.alpha, "cv_limit": args.cv_limit, "method": args.ic50_method, "conc_unit": args.conc_unit}
+    options = {"alpha": args.alpha, "cv_limit": args.cv_limit, "method": args.ic50_method,
+               "conc_unit": args.conc_unit, "std_unit": args.std_unit}
     results = []
     for key, path in inputs.items():
         try:
-            results.append(ASSAYS[key].run(read_table(path), **options))
+            result = ASSAYS[key].run(read_table(path), **options)
+            result.extra["source"] = path.name
+            result.extra["study"] = args.study
+            results.append(result)
         except AssayInputError as e:
             print(f"[{path.name}] {e}", file=sys.stderr)
             return 2

@@ -70,12 +70,36 @@ def analyze_dpph(
         warns.append("DPPH: some readings are below 0 % inhibition (sample absorbs more than the control). "
                      "A coloured extract adds its own absorbance; record a sample blank (abs_blank).")
 
+    return _summarize_inhibition(rows, method, conc_unit, cv_limit, alpha, warns)
+
+
+def analyze_dpph_inhibition(df: pd.DataFrame, conc_unit: str = "µg/mL", method: str = "logistic",
+                            cv_limit: float = 10.0, alpha: float = 0.05) -> AssayResult:
+    """Analyze supplied inhibition values without fabricating absorbance readings."""
+    if method not in IC50_METHODS:
+        raise AssayInputError(f"DPPH: IC50 method must be one of {', '.join(IC50_METHODS)}.")
+    rows = prepare(df, "DPPH", required=["sample_id", "inhibition_pct"], numeric=["inhibition_pct"],
+                   optional_numeric=["concentration"])
+    if "concentration" not in rows:
+        rows["concentration"] = np.nan
+    if (rows["concentration"].dropna() < 0).any():
+        raise AssayInputError("DPPH: concentration cannot be negative.")
+    warns = ["DPPH: supplied percentage inhibition was used; absorbance and blank corrections cannot be verified."]
+    if ((rows["inhibition_pct"] < 0) | (rows["inhibition_pct"] > 100)).any():
+        warns.append("DPPH: some supplied inhibition values lie outside 0–100%; check the source.")
+    result = _summarize_inhibition(rows, method, conc_unit, cv_limit, alpha, warns)
+    result.extra["input_basis"] = "calculated_results"
+    return result
+
+
+def _summarize_inhibition(rows, method, conc_unit, cv_limit, alpha, warns):
     # % inhibition per sample, at each concentration tested. Letters compare samples
     # tested at the same concentration (or all samples, if no concentrations are given).
-    tables = []
+    tables, comparisons = [], {}
     level_key = rows["concentration"].fillna(-1)
     for level, sub in rows.groupby(level_key, sort=False):
-        t, _, sw = summarize(sub, "inhibition_pct", cv_limit=cv_limit, alpha=alpha)
+        t, comparison, sw = summarize(sub, "inhibition_pct", cv_limit=cv_limit, alpha=alpha)
+        comparisons[f"concentration {level:g}"] = comparison
         t.insert(1, "concentration", np.nan if level == -1 else level)
         tables.append(t)
         at = "" if level == -1 else f" at {level:g} {conc_unit}"
@@ -83,10 +107,11 @@ def analyze_dpph(
     summary = pd.concat(tables, ignore_index=True)
 
     ic50, ic50_reps, methods, fits = _ic50_tables(rows, method, cv_limit, alpha, warns)
+    comparisons["IC50"] = ic50.attrs.get("comparison")
     return AssayResult(
         assay="DPPH", unit="% inhibition", rows=rows, summary=summary, warnings=warns,
         extra={"ic50": ic50, "ic50_replicates": ic50_reps, "method_comparison": methods, "fits": fits,
-               "method": method, "conc_unit": conc_unit, "value_col": "inhibition_pct"},
+               "method": method, "conc_unit": conc_unit, "alpha": alpha, "comparisons": comparisons, "value_col": "inhibition_pct"},
     )
 
 
@@ -116,10 +141,12 @@ def _ic50_tables(rows, method, cv_limit, alpha, warns):
     valid = reps.dropna(subset=["ic50"])
     if len(valid):
         # Lower IC50 = stronger antioxidant, so 'a' marks the lowest IC50.
-        table, _, sw = summarize(valid, "ic50", cv_limit=cv_limit, alpha=alpha, higher_is_better=False)
+        table, comparison, sw = summarize(valid, "ic50", cv_limit=cv_limit, alpha=alpha, higher_is_better=False)
+        table.attrs["comparison"] = comparison
         warns += [f"DPPH IC50 — {w}" for w in sw]
     else:
         table = pd.DataFrame(columns=["sample_id", "n", "mean", "sd", "sem", "cv_pct", "letters"])
+    comparison = table.attrs.get("comparison")
     notes = reps.groupby("sample_id", sort=False)["note"].apply(lambda s: "; ".join(sorted({n for n in s if n})))
     table = pd.DataFrame({"sample_id": [s for s in rows["sample_id"].unique() if s in series]}).merge(
         table, on="sample_id", how="left")
@@ -127,6 +154,7 @@ def _ic50_tables(rows, method, cv_limit, alpha, warns):
     for r in table.itertuples():
         if r.note:
             warns.append(f"DPPH {r.sample_id}: {r.note}.")
+    table.attrs["comparison"] = comparison
     return table, reps, pd.DataFrame(method_rows), fits
 
 
@@ -187,6 +215,9 @@ def estimate_ic50(x: np.ndarray, y: np.ndarray, method: str) -> dict:
         cx, cy = means.index.to_numpy(), means.to_numpy()
         cx, cy = cx[cx > 0], cy[cx > 0]
         above = np.nonzero(cy >= 50)[0]
+        if not len(above):
+            return {"ic50": np.nan, "r2": np.nan,
+                    "note": f"50 % inhibition not reached by concentration means; IC50 > {cx.max():g}"}
         first = above[0]
         if first == 0:
             # Already ≥ 50 % at the lowest dose: extrapolate on the first segment.

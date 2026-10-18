@@ -78,11 +78,11 @@ def _negative_warning(rows: pd.DataFrame, what: str) -> list[str]:
 
 
 def _finish(rows, what, unit, value_col, cv_limit, alpha, higher_is_better, extra, warns) -> AssayResult:
-    summary, _, stat_warns = summarize(rows, value_col, cv_limit=cv_limit, alpha=alpha,
+    summary, comparison, stat_warns = summarize(rows, value_col, cv_limit=cv_limit, alpha=alpha,
                                        higher_is_better=higher_is_better)
     return AssayResult(assay=what, unit=unit, rows=rows, summary=summary,
                        warnings=warns + [f"{what} — {w}" for w in stat_warns],
-                       extra={"value_col": value_col, **extra})
+                       extra={"value_col": value_col, "alpha": alpha, "comparisons": {"samples": comparison}, **extra})
 
 
 def analyze_acid_value(

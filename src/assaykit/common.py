@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 
@@ -39,6 +40,8 @@ def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
         str(c).strip().lower().replace(" ", "_").replace("-", "_").replace("(", "").replace(")", "")
         for c in out.columns
     ]
+    if out.columns.duplicated().any():
+        raise AssayInputError("Column names must be unique after normalization.")
     # Drop rows that are entirely empty (common in hand-made spreadsheets).
     out = out.dropna(how="all").reset_index(drop=True)
     return out
@@ -57,6 +60,8 @@ def prepare(
         raise AssayInputError(f"{assay}: the table is empty.")
 
     out = normalize_columns(df)
+    if out.empty:
+        raise AssayInputError(f"{assay}: the table is empty.")
 
     missing = [c for c in required if c not in out.columns]
     if missing:
@@ -65,6 +70,11 @@ def prepare(
             f"Found: {', '.join(out.columns)}. Download the template to see the expected layout."
         )
 
+    for col in ("sample_id", "replicate") + (("element",) if "element" in required else ()):
+        if col in out.columns:
+            missing_id = out[col].isna() | out[col].astype(str).str.strip().eq("")
+            if missing_id.any():
+                raise AssayInputError(f"{assay}: '{col}' is empty on spreadsheet row(s) {_sheet_rows(out.index[missing_id])}.")
     out["sample_id"] = out["sample_id"].astype(str).str.strip()
     if "replicate" not in out.columns:
         out["replicate"] = out.groupby("sample_id").cumcount() + 1
@@ -80,6 +90,8 @@ def prepare(
                 f"(e.g. {examples})."
             )
         out[col] = converted
+        if np.isinf(converted).any():
+            raise AssayInputError(f"{assay}: column '{col}' must contain finite numbers.")
 
     for col in numeric:
         empty = out[col].isna()
@@ -88,6 +100,13 @@ def prepare(
                 f"{assay}: column '{col}' is empty on spreadsheet row(s) {_sheet_rows(out.index[empty])}."
             )
     return out
+
+
+def require_positive(rows: pd.DataFrame, columns: list[str], assay: str) -> None:
+    """Validate supplied physical quantities; optional blank cells remain allowed."""
+    for col in columns:
+        if col in rows and (rows[col].dropna() <= 0).any():
+            raise AssayInputError(f"{assay}: {col} must be greater than 0.")
 
 
 def _sheet_rows(index: pd.Index) -> str:

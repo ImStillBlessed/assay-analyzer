@@ -1,0 +1,77 @@
+assay,sample_id,group_id,replicate,value,unit,concentration,concentration_unit,element,source_page,source_table,note
+tpc,Cottonseed A,Cottonseed,A,81.545,g TAE/kg,,,,1,4.2 seed phytochemicals,
+tpc,Cottonseed B,Cottonseed,B,82.803,g TAE/kg,,,,1,4.2 seed phytochemicals,
+tpc,Cottonseed C,Cottonseed,C,82.703,g TAE/kg,,,,1,4.2 seed phytochemicals,
+flavonoids,Cottonseed A,Cottonseed,A,11.006,g QE/kg,,,,1,4.2 seed phytochemicals,
+flavonoids,Cottonseed B,Cottonseed,B,9.646,g QE/kg,,,,1,4.2 seed phytochemicals,
+flavonoids,Cottonseed C,Cottonseed,C,6.805,g QE/kg,,,,1,4.2 seed phytochemicals,
+tannins,Cottonseed A,Cottonseed,A,24.678,g TEA/kg (reported),,,,1,4.2 seed phytochemicals,Source spells the tannin equivalent TEA; not silently corrected to TAE.
+tannins,Cottonseed B,Cottonseed,B,20.221,g TEA/kg (reported),,,,1,4.2 seed phytochemicals,Source spells the tannin equivalent TEA; not silently corrected to TAE.
+tannins,Cottonseed C,Cottonseed,C,18.772,g TEA/kg (reported),,,,1,4.2 seed phytochemicals,Source spells the tannin equivalent TEA; not silently corrected to TAE.
+saponins,Cottonseed A,Cottonseed,A,9.547,g/kg,,,,1,4.2 seed phytochemicals,
+saponins,Cottonseed B,Cottonseed,B,9.547,g/kg,,,,1,4.2 seed phytochemicals,
+saponins,Cottonseed C,Cottonseed,C,9.256,g/kg,,,,1,4.2 seed phytochemicals,
+alkaloids,Cottonseed A,Cottonseed,A,6,%,,,,1,4.2 seed phytochemicals,
+alkaloids,Cottonseed B,Cottonseed,B,6.85,%,,,,1,4.2 seed phytochemicals,
+alkaloids,Cottonseed C,Cottonseed,C,7.15,%,,,,1,4.2 seed phytochemicals,
+oxalate,Cottonseed A,Cottonseed,A,0.445,mg/g,,,,1,4.2 seed phytochemicals,
+oxalate,Cottonseed B,Cottonseed,B,0.435,mg/g,,,,1,4.2 seed phytochemicals,
+oxalate,Cottonseed C,Cottonseed,C,0.435,mg/g,,,,1,4.2 seed phytochemicals,
+phytate,Cottonseed A,Cottonseed,A,2.153,% phytic acid,,,,1,4.2 seed phytochemicals,
+phytate,Cottonseed B,Cottonseed,B,2.091,% phytic acid,,,,1,4.2 seed phytochemicals,
+phytate,Cottonseed C,Cottonseed,C,2.112,% phytic acid,,,,1,4.2 seed phytochemicals,
+tpc,Cottonseed oil A,Cottonseed oil,A,4.571,g TAE/kg,,,,1,4.2 oil phenolics,
+tpc,Cottonseed oil B,Cottonseed oil,B,5.008,g TAE/kg,,,,1,4.2 oil phenolics,
+tpc,Cottonseed oil C,Cottonseed oil,C,5.299,g TAE/kg,,,,1,4.2 oil phenolics,
+dpph,Cottonseed,Cottonseed,1,46.371,% inhibition,250,µg/mL,,1,4.3 seed DPPH,
+dpph,Cottonseed,Cottonseed,1,45.766,% inhibition,200,µg/mL,,1,4.3 seed DPPH,
+dpph,Cottonseed,Cottonseed,1,39.583,% inhibition,150,µg/mL,,1,4.3 seed DPPH,
+dpph,Cottonseed,Cottonseed,1,33.129,% inhibition,100,µg/mL,,1,4.3 seed DPPH,
+dpph,Cottonseed,Cottonseed,1,29.113,% inhibition,50,µg/mL,,1,4.3 seed DPPH,
+dpph,Cottonseed oil,Cottonseed oil,1,66.532,% inhibition,250,µg/mL,,2,4.5 oil DPPH,
+dpph,Cottonseed oil,Cottonseed oil,1,61.828,% inhibition,200,µg/mL,,2,4.5 oil DPPH,
+dpph,Cottonseed oil,Cottonseed oil,1,53.743,% inhibition,150,µg/mL,,2,4.5 oil DPPH,
+dpph,Cottonseed oil,Cottonseed oil,1,42.016,% inhibition,100,µg/mL,,2,4.5 oil DPPH,
+dpph,Cottonseed oil,Cottonseed oil,1,32.823,% inhibition,50,µg/mL,,2,4.5 oil DPPH,
+dpph,Ascorbic acid,Ascorbic acid,1,88.706,% inhibition,250,µg/mL,,1,4.3 seed DPPH; 4.5 oil DPPH,Identical reference series appears in both DPPH tables; retained once.
+dpph,Ascorbic acid,Ascorbic acid,1,70.627,% inhibition,200,µg/mL,,1,4.3 seed DPPH; 4.5 oil DPPH,Identical reference series appears in both DPPH tables; retained once.
+dpph,Ascorbic acid,Ascorbic acid,1,64.114,% inhibition,150,µg/mL,,1,4.3 seed DPPH; 4.5 oil DPPH,Identical reference series appears in both DPPH tables; retained once.
+dpph,Ascorbic acid,Ascorbic acid,1,56.556,% inhibition,100,µg/mL,,1,4.3 seed DPPH; 4.5 oil DPPH,Identical reference series appears in both DPPH tables; retained once.
+dpph,Ascorbic acid,Ascorbic acid,1,40.866,% inhibition,50,µg/mL,,1,4.3 seed DPPH; 4.5 oil DPPH,Identical reference series appears in both DPPH tables; retained once.
+frap,Cottonseed oil,Cottonseed oil,1,51.317,% FRAP (reported),250,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Cottonseed oil,Cottonseed oil,1,42.828,% FRAP (reported),200,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Cottonseed oil,Cottonseed oil,1,36.732,% FRAP (reported),150,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Cottonseed oil,Cottonseed oil,1,26.211,% FRAP (reported),100,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Cottonseed oil,Cottonseed oil,1,18.82,% FRAP (reported),50,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Ascorbic acid,Ascorbic acid,1,80.743,% FRAP (reported),250,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Ascorbic acid,Ascorbic acid,1,69.17,% FRAP (reported),200,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Ascorbic acid,Ascorbic acid,1,60.532,% FRAP (reported),150,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Ascorbic acid,Ascorbic acid,1,40.221,% FRAP (reported),100,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+frap,Ascorbic acid,Ascorbic acid,1,33.775,% FRAP (reported),50,µg/mL,,2,4.5 oil FRAP,Percentage basis reported by source; normalization formula not supplied.
+acid_value,cotton 1,Cottonseed oil,1,26.297,mg KOH/g,,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+acid_value,cotton 2,Cottonseed oil,2,17.262,mg KOH/g,,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+acid_value,cotton 3,Cottonseed oil,3,26.354,mg KOH/g,,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+ffa,cotton 1,Cottonseed oil,1,13.227,% (as oleic),,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+ffa,cotton 2,Cottonseed oil,2,8.683,% (as oleic),,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+ffa,cotton 3,Cottonseed oil,3,13.256,% (as oleic),,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+peroxide,cotton 1,Cottonseed oil,1,100,meq O2/kg,,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+peroxide,cotton 2,Cottonseed oil,2,98.039,meq O2/kg,,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+peroxide,cotton 3,Cottonseed oil,3,100.719,meq O2/kg,,,,2,4.6 oil quality,Sample labels retained; combine only if these are confirmed repeats.
+minerals,Cottonseed,Cottonseed,1,33.3,mg/kg,,,Fe,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,0,mg/kg,,,Fe,2,4.7 minerals,Numeric zero retained as printed; ND meaning and LOD not established.
+minerals,Cottonseed,Cottonseed,1,1.401,mg/kg,,,Zn,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,0.23,mg/kg,,,Zn,2,4.7 minerals,
+minerals,Cottonseed,Cottonseed,1,117.7,mg/kg,,,K,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,1.081,mg/kg,,,K,2,4.7 minerals,
+minerals,Cottonseed,Cottonseed,1,0.061,mg/kg,,,Ni,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,0.008,mg/kg,,,Ni,2,4.7 minerals,
+minerals,Cottonseed,Cottonseed,1,0,mg/kg,,,Pb,2,4.7 minerals,Numeric zero retained as printed; ND meaning and LOD not established.
+minerals,Cottonseed oil,Cottonseed oil,1,0,mg/kg,,,Pb,2,4.7 minerals,Numeric zero retained as printed; ND meaning and LOD not established.
+minerals,Cottonseed,Cottonseed,1,178.8,mg/kg,,,Ca,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,0.98,mg/kg,,,Ca,2,4.7 minerals,
+minerals,Cottonseed,Cottonseed,1,0.085,mg/kg,,,Cu,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,0,mg/kg,,,Cu,2,4.7 minerals,Numeric zero retained as printed; ND meaning and LOD not established.
+minerals,Cottonseed,Cottonseed,1,0,mg/kg,,,Cd,2,4.7 minerals,Numeric zero retained as printed; ND meaning and LOD not established.
+minerals,Cottonseed oil,Cottonseed oil,1,0,mg/kg,,,Cd,2,4.7 minerals,Numeric zero retained as printed; ND meaning and LOD not established.
+minerals,Cottonseed,Cottonseed,1,0.133,mg/kg,,,Mn,2,4.7 minerals,
+minerals,Cottonseed oil,Cottonseed oil,1,0.08,mg/kg,,,Mn,2,4.7 minerals,

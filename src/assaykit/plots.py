@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from functools import partial
 
 import matplotlib
 
@@ -49,6 +50,7 @@ def bars(
     limits: dict[str, float] | None = None,
     label_col: str = "sample_id",
     better: str = "",
+    alpha: float = 0.05,
 ) -> Figure:
     """Horizontal bars, mean ± error, Tukey letters at the bar end, optional reference lines."""
     s = table.dropna(subset=[mean_col]).reset_index(drop=True)
@@ -77,7 +79,7 @@ def bars(
     ax.set_ylim(-0.6, len(s) - 0.4 + (0.35 + 0.32 * len(limits) if limits else 0))
     note = f"Mean ± {ERR_LABEL.get(err, err)}."
     if letters.str.len().any():
-        note += f" Bars sharing a letter are not significantly different (ANOVA, Tukey HSD, p < 0.05); 'a' = {better or 'highest'}."
+        note += f" Bars sharing a letter are not significantly different (Tukey HSD, α = {alpha:g}); 'a' = {better or 'highest'}."
     fig.text(0.01, 0.01, note, fontsize=7.5, color=INK_2)
     fig.tight_layout(rect=(0, 0.04, 1, 1))
     return fig
@@ -172,7 +174,19 @@ def minerals_grid(res: AssayResult, err: str = "sem") -> Figure:
 
 def figures_for(res: AssayResult, err: str = "sem") -> dict[str, Figure]:
     """All standard figures for a result, keyed by a file-friendly name."""
+    bars = partial(globals()["bars"], alpha=res.extra.get("alpha", 0.05))
+    if res.assay == "Qualitative screening":
+        return {}
     key = res.assay.lower().replace(" ", "_").replace("(", "").replace(")", "").replace("&", "and")
+    if res.extra.get("reported"):
+        figures = {}
+        for element, group in res.summary.groupby("element", sort=False, dropna=False):
+            label = group.assign(label=[f"{r.sample_id}" if pd.isna(r.concentration) else f"{r.sample_id} @ {r.concentration:g}"
+                                        for r in group.itertuples()])
+            if label["mean"].notna().any():
+                name = f"{key}_{element}" if element else key
+                figures[name] = bars(label, res.assay + (f" · {element}" if element else ""), res.unit, err, label_col="label")
+        return figures
     if res.assay == "DPPH":
         figs = {}
         if not res.extra["ic50"].empty:

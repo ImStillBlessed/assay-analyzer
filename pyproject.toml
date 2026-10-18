@@ -1,7 +1,7 @@
 [project]
 name = "assaykit"
-version = "0.1.0"
-description = "DPPH, FRAP, peroxide value and free fatty acid analysis for antioxidant and oil-quality labs"
+version = "0.2.0"
+description = "Extensible laboratory assay analysis, quality checks, statistics and reports across studies"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
